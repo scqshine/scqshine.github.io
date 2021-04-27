@@ -16,8 +16,10 @@
 <meta property="og:description" content="[toc] 多线程编程推荐使用线程池进行多线程编程的话，我们必定会用到一个类：ThreadPoolExecutor，它继承了AbstractExecutorService，实现ExecutorService接口。ThreadPoolExecutor可以设置线程池维护线程最小数量，最大线程数量，允许空闲时间以及单位，拒绝策略等，其中拒绝策略是我们本次的重点，如果多线程中使用错了拒绝策略，那么可以说你">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-04-27T06:19:46.000Z">
-<meta property="article:modified_time" content="2021-04-27T07:09:26.959Z">
+<meta property="article:modified_time" content="2021-04-27T07:20:36.308Z">
 <meta property="article:author" content="John Doe">
+<meta property="article:tag" content="多线程">
+<meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -208,7 +210,8 @@
 </li>
 </ul>
 <h2 id="策略说明"><a href="#策略说明" class="headerlink" title="策略说明"></a>策略说明</h2><p>以上策略是独立无关的，只能选择其一。最简单的拒绝方式就是直接丢弃任务。但两种方式，到底是该丢弃哪一个任务，比如可以丢弃当前将要加入队列的任务本身（DiscardPolicy策略）或者丢弃任务队列中最旧任务（DiscardOldestPolicy策略）。丢弃最旧任务也不是简单的丢弃最旧的任务，它也会有一些额外的处理。除了丢弃任务还可以直接抛出一个异常（RejectedExecutionException），这是比较简单的方式。抛出异常的方式（AbortPolicy策略）尽管实现方式比较简单，但是由于抛出一个RuntimeException，因此会中断调用者的处理过程。除了抛出异常以外还可以不进入线程池执行，在这种方式（CallerRunsPolicy策略）中任务将有调用者线程去执行。<br>实际编程中可以根据业务场景需要选择适合的拒绝策略。</p>
-<p><em>大家可以关注我的头条号：*</em>@IT讲坛** *</p>
+<p><em>大家可以关注我的头条号：*</em>@IT讲坛***</p>
+<p><em>谢谢</em></p>
 
       
 
@@ -238,6 +241,21 @@
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -428,6 +446,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
