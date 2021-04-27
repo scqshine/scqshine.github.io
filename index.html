@@ -152,6 +152,103 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-myFirstT" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/27/myFirstT/">多线程编程推荐</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/27/myFirstT/" class="archive-article-date">
+  	<time datetime="2021-04-27T06:19:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<h1 id="多线程编程推荐"><a href="#多线程编程推荐" class="headerlink" title="多线程编程推荐"></a>多线程编程推荐</h1><p>使用线程池进行多线程编程的话，我们必定会用到一个类：ThreadPoolExecutor，它继承了AbstractExecutorService，实现ExecutorService接口。ThreadPoolExecutor可以设置线程池维护线程最小数量，最大线程数量，允许空闲时间以及单位，拒绝策略等，其中拒绝策略是我们本次的重点，如果多线程中使用错了拒绝策略，那么可以说你的多线程是很失败的，甚至会给带来业务异常，给公司造成重大的经济损失。</p>
+<p>线程池构造方法：</p>
+<p>![image-20210427145009580](/Users/shanchangqing/Library/Application Support/typora-user-images/image-20210427145009580.png)</p>
+<h2 id="参数解释"><a href="#参数解释" class="headerlink" title="参数解释"></a>参数解释</h2><ul>
+<li><p><strong>corePoolSize</strong></p>
+<p>线程池维护线程的最少数量，在创建了线程池后，线程池中的线程数为0，当有任务来之后，就会创建一个线程去执行任务，当线程池中的线程数目达到corePoolSize后，就会把到达的任务放到缓存队列当中。</p>
+</li>
+<li><p><strong>maximumPoolSize</strong></p>
+<p>线程池维护线程的最大数量，它表示在线程池中最多能创建多少个线程；这个参数是跟后面的阻塞队列联系紧密的；只有当阻塞队列满了，如果还有任务添加到线程池的话，会尝试new 一个Thread的进行救急处理，立马执行对应的runnable任务；如果继续添加任务到线程池，且线程池中的线程数已经达到了maximumPoolSize，那么线程就会就会执行reject操作。</p>
+</li>
+<li><p><strong>keepAliveTime</strong></p>
+<p>线程池维护线程所允许的空闲时间，表示线程没有任务执行时最多保持多久时间会终止；默认情况下，只有当线程池中的线程数大于corePoolSize时，keepAliveTime才会起作用；即当线程池中的线程数大于corePoolSize时，如果一个线程空闲的时间达到keepAliveTime，则会终止，直到线程池中的线程数不超过corePoolSize。但是如果调用了allowCoreThreadTimeOut(boolean)方法并设置了参数为true，在线程池中的线程数不大于corePoolSize时，keepAliveTime参数也会起作用，直到线程池中的阻塞队列大小为0；（这部分通过查看ThreadPoolExecutor的源码分析–getTask()部分）</p>
+</li>
+<li><p><strong>unit</strong></p>
+<p>线程池维护线程所允许的空闲时间的单位，参数keepAliveTime的时间单位，有7种取值，在TimeUnit类中有7种静态属性（时间单位）。</p>
+</li>
+<li><p><strong>workQueue</strong></p>
+<p>线程池所使用的缓冲队列，用来存储等待执行的任务，这个参数的选择也很重要，会对线程池的运行过程产生重大影响，一般来说，这里的阻塞队列有以下几种选择：</p>
+<p>ArrayBlockingQueue;LinkedBlockingQueue;SynchronousQueue;</p>
+</li>
+<li><p><strong>threadFactory</strong></p>
+<p>线程工厂，主要用来创建线程：默认值 DefaultThreadFactory。</p>
+</li>
+<li><p><strong>handler</strong></p>
+<p>线程池对拒绝任务的处理策略，就是上面提及的reject操作；有以下四种取值：ThreadPoolExecutor.AbortPolicy:丢弃任务并抛出</p>
+<p>![image-20210427150447088](/Users/shanchangqing/Library/Application Support/typora-user-images/image-20210427150447088.png)</p>
+<p>RejectedExecutionException异常。（默认handle）ThreadPoolExecutor.DiscardPolicy：也是丢弃任务，但是不抛出异常。</p>
+<p>![image-20210427150626737](/Users/shanchangqing/Library/Application Support/typora-user-images/image-20210427150626737.png)ThreadPoolExecutor.DiscardOldestPolicy：丢弃队列最前面的任务，然后重新尝试执行任务（重复此过程）</p>
+<p>![image-20210427150604112](/Users/shanchangqing/Library/Application Support/typora-user-images/image-20210427150604112.png)ThreadPoolExecutor.CallerRunsPolicy：由调用线程处理该任务。</p>
+<p>![image-20210427150535051](/Users/shanchangqing/Library/Application Support/typora-user-images/image-20210427150535051.png)</p>
+</li>
+</ul>
+<h2 id="策略说明"><a href="#策略说明" class="headerlink" title="策略说明"></a>策略说明</h2><p>以上策略是独立无关的，只能选择其一。最简单的拒绝方式就是直接丢弃任务。但两种方式，到底是该丢弃哪一个任务，比如可以丢弃当前将要加入队列的任务本身（DiscardPolicy策略）或者丢弃任务队列中最旧任务（DiscardOldestPolicy策略）。丢弃最旧任务也不是简单的丢弃最旧的任务，它也会有一些额外的处理。除了丢弃任务还可以直接抛出一个异常（RejectedExecutionException），这是比较简单的方式。抛出异常的方式（AbortPolicy策略）尽管实现方式比较简单，但是由于抛出一个RuntimeException，因此会中断调用者的处理过程。除了抛出异常以外还可以不进入线程池执行，在这种方式（CallerRunsPolicy策略）中任务将有调用者线程去执行。<br>实际编程中可以根据业务场景需要选择适合的拒绝策略。</p>
+<p><em>大家可以关注我的头条号：*</em>@IT讲坛** *</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/27/myFirstT/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-hello-world" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
